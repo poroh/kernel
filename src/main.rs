@@ -8,7 +8,8 @@
 mod arch;
 mod common;
 
-use core::arch::asm;
+use crate::arch::x86;
+use core::fmt::Write;
 use core::panic::PanicInfo;
 
 #[panic_handler]
@@ -17,11 +18,20 @@ fn panic(_info: &PanicInfo) -> ! {
 }
 
 #[no_mangle]
-pub extern "C" fn _start() -> ! {
+pub extern "C" fn _start(boot_info: &'static mut bootloader::BootInfo) -> ! {
     arch::x86::boot::init();
+    let mut serial = x86::platform::boot_com1();
+    let _ = write!(serial, "\x1bc");
+    let _ = write!(serial, "\x1b[?7h");
+    let _ = writeln!(serial, "boot info: {boot_info:?}");
+    let _ = write!(serial, "\x1b[0m");
+    let _ = write!(serial, "\x1b[c");
     loop {
-        unsafe {
-            asm!("hlt");
+        match serial.try_read().and_then(core::ascii::Char::from_u8) {
+            Some(core::ascii::Char::Escape) => (),
+            Some(c) => serial.put_ascii(c),
+            None => (),
         }
+        x86::cpu::relax();
     }
 }

@@ -130,7 +130,7 @@ impl Serial {
                 break None;
             }
             timeout -= 1;
-            x86::cpu_relax();
+            x86::cpu::relax();
         }
     }
 

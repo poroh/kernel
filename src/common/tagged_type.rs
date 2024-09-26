@@ -17,6 +17,11 @@ impl<T, M> TaggedType<T, M> {
     pub fn inner(&self) -> &T {
         &self.v
     }
+
+    #[inline]
+    pub fn into_inner(self) -> T {
+        self.v
+    }
 }
 
 impl<T, M> Clone for TaggedType<T, M>
