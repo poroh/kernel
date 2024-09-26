@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: MIT
 
-pub mod uart16550;
+use crate::arch::x86::io;
+use crate::drivers::serial;
+
 pub mod vga;
 
-pub fn boot_com1() -> uart16550::Serial {
-    uart16550::Serial::boot_new(uart16550::BootConfig {
-        port: uart16550::Port::Com1,
-        rate: uart16550::BaudRate::Rate9600,
-    })
+static COM1_IO_ACCESS: io::IOAccess = io::IOAccess::new(io::Port::new(0x3f8));
+
+pub fn boot_com1() -> impl serial::Device {
+    serial::uart16550::boot_new(&COM1_IO_ACCESS, serial::BaudRate::Rate9600)
 }

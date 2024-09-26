@@ -6,7 +6,7 @@ pub struct TaggedType<T, M> {
 }
 
 impl<T, M> TaggedType<T, M> {
-    pub fn new(v: T) -> Self {
+    pub const fn new(v: T) -> Self {
         TaggedType {
             v,
             _marker: core::marker::PhantomData,
