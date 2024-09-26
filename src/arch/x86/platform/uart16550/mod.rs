@@ -75,19 +75,16 @@ pub struct Serial {
     port: Port,
 }
 
+pub struct BootConfig {
+    pub port: Port,
+    pub rate: BaudRate,
+}
+
 impl Serial {
-    pub fn new(port: Port) -> Serial {
-        Serial { port }
-    }
-
-    pub fn boot_init(&self, rate: &BaudRate) {
-        lcr::write(&self.base(), &lcr::Value::mode_8n1());
-        lcr::write(&self.base(), &lcr::Value::mode_8n1());
-        ier::write(&self.base(), &ier::Value::no_interrupt());
-        fcr::write(&self.base(), &fcr::Value::no_fifo());
-        mcr::write(&self.base(), &mcr::Value::dtr_rts());
-
-        self.with_divisor_latched(|dl| dl.set_baud_rate(rate));
+    pub fn boot_new(config: BootConfig) -> Serial {
+        let s = Serial { port: config.port };
+        s.boot_init(&config.rate);
+        s
     }
 
     pub fn put_ascii(&self, c: core::ascii::Char) {
@@ -102,6 +99,15 @@ impl Serial {
         } else {
             None
         }
+    }
+
+    fn boot_init(&self, rate: &BaudRate) {
+        lcr::write(&self.base(), &lcr::Value::mode_8n1());
+        ier::write(&self.base(), &ier::Value::no_interrupt());
+        fcr::write(&self.base(), &fcr::Value::no_fifo());
+        mcr::write(&self.base(), &mcr::Value::dtr_rts());
+
+        self.with_divisor_latched(|dl| dl.set_baud_rate(rate));
     }
 
     fn with_divisor_latched<F>(&self, f: F)
@@ -124,6 +130,15 @@ impl Serial {
                 break None;
             }
             timeout -= 1;
+            x86::cpu_relax();
+        }
+    }
+
+    fn write_string(&self, s: &str) {
+        for byte in s.bytes() {
+            self.poll_write_ready().map(|r| {
+                r.write(byte);
+            });
         }
     }
 
@@ -132,6 +147,13 @@ impl Serial {
             Port::Com1 => UARTPortBase::new(x86::io::Port::new(0x3f8)),
             Port::Com2 => UARTPortBase::new(x86::io::Port::new(0x2f8)),
         }
+    }
+}
+
+impl core::fmt::Write for Serial {
+    fn write_str(&mut self, s: &str) -> core::fmt::Result {
+        self.write_string(s);
+        Ok(())
     }
 }
 

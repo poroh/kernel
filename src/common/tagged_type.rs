@@ -18,3 +18,32 @@ impl<T, M> TaggedType<T, M> {
         &self.v
     }
 }
+
+impl<T, M> Clone for TaggedType<T, M>
+where
+    T: Clone,
+{
+    fn clone(&self) -> Self {
+        Self::new(self.v.clone())
+    }
+}
+
+impl<T, M> Copy for TaggedType<T, M> where T: Copy {}
+
+impl<T, M> core::fmt::Debug for TaggedType<T, M>
+where
+    T: core::fmt::Debug,
+{
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        self.v.fmt(f)
+    }
+}
+
+impl<T, M> core::fmt::Display for TaggedType<T, M>
+where
+    T: core::fmt::Display,
+{
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        self.v.fmt(f)
+    }
+}
