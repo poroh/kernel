@@ -10,6 +10,8 @@ extern crate alloc;
 mod arch;
 mod common;
 mod cpu;
+#[macro_use]
+mod diag;
 mod drivers;
 mod memory;
 
@@ -31,6 +33,7 @@ pub extern "C" fn _start(boot_info: &'static mut bootloader::BootInfo) -> ! {
     arch::x86::boot::init();
     let com1 = x86::platform::boot_com1();
     let mut serial = com1.formattable();
+    kprint!("Test");
     //let _ = write!(serial, "\x1bc");
     let _ = write!(serial, "\x1b[?7h");
     let _ = writeln!(serial, "boot info: {boot_info:?}");

@@ -2,14 +2,20 @@
 
 use crate::arch::x86;
 use crate::drivers::serial::Device;
-use core::fmt::Write;
+use crate::drivers::serial::FmtWritable;
+use crate::kprint;
+
+static mut COM1: Option<x86::platform::COMPort> = None;
+static mut COM1_FORMATTABLE: Option<FmtWritable<x86::platform::COMPort>> = None;
 
 pub fn init() {
-    let com1 = x86::platform::boot_com1();
-    let mut serial = com1.formattable();
-    let _ = serial.write_str("Hello kernel\n");
-    let cr0 = x86::cpu::cr0::read();
-    let _ = serial.write_fmt(format_args!("CR0: {cr0:?}\n"));
-    let cr3 = x86::cpu::cr3::read();
-    let _ = serial.write_fmt(format_args!("CR3: {cr3:?}\n"));
+    unsafe {
+        COM1 = Some(x86::platform::boot_com1());
+        COM1_FORMATTABLE = Some(COM1.as_ref().unwrap().formattable());
+        crate::diag::init(COM1_FORMATTABLE.as_mut().unwrap());
+    };
+
+    kprint!("Hello kernel");
+    kprint!("CR0: {:?}", x86::cpu::cr0::read());
+    kprint!("CR3: {:?}", x86::cpu::cr3::read());
 }
