@@ -9,3 +9,7 @@ use core::arch::asm;
 pub fn relax() {
     unsafe { asm!("rep; nop") };
 }
+
+pub fn hlt() {
+    unsafe { asm!("hlt") };
+}
