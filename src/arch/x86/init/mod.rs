@@ -3,7 +3,7 @@
 use crate::arch::x86;
 use crate::drivers::serial::Device;
 use crate::drivers::serial::FmtWritable;
-use crate::kprint;
+use crate::kprintln;
 
 static mut COM1: Option<x86::platform::COMPort> = None;
 static mut COM1_FORMATTABLE: Option<FmtWritable<x86::platform::COMPort>> = None;
@@ -15,7 +15,7 @@ pub fn init() {
         crate::diag::init(COM1_FORMATTABLE.as_mut().unwrap());
     };
 
-    kprint!("Hello kernel");
-    kprint!("CR0: {:?}", x86::cpu::cr0::read());
-    kprint!("CR3: {:?}", x86::cpu::cr3::read());
+    kprintln!("Hello kernel");
+    kprintln!("CR0: {:?}", x86::cpu::cr0::read());
+    kprintln!("CR3: {:?}", x86::cpu::cr3::read());
 }

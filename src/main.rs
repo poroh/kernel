@@ -15,7 +15,6 @@ mod diag;
 mod drivers;
 mod memory;
 
-use crate::arch::x86;
 use core::panic::PanicInfo;
 
 #[panic_handler]
@@ -26,7 +25,7 @@ fn panic(info: &PanicInfo) -> ! {
 
 #[no_mangle]
 pub extern "C" fn _start(boot_info: &'static mut bootloader::BootInfo) -> ! {
-    arch::x86::boot::init();
+    arch::init();
     //let _ = write!(serial, "\x1bc");
     kprint!("\x1b[?7h");
     kprintln!("boot info: {boot_info:?}");
