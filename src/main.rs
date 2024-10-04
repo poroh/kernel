@@ -18,20 +18,18 @@ mod memory;
 use core::panic::PanicInfo;
 
 core::arch::global_asm!(include_str!("pvh_note.s"));
-core::arch::global_asm!(include_str!("pvh_start.s"));
 
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
-    kprintln!("Panic: {info:?}");
+    kprintln!("panic: {info:?}");
     arch::halt();
 }
 
-#[no_mangle]
-pub extern "C" fn _start() -> ! {
-    arch::init();
+fn kernel_main() -> ! {
     kprint!("\x1b[?7h");
     kprint!("\x1b[0m");
     kprint!("\x1b[c");
+    kprintln!("enter kernel_main and die");
     //let x = alloc::boxed::Box::new(11);
     //kprintln!("Boxx: {x}");
     loop {
