@@ -1,4 +1,5 @@
 
 
 all:
-	cargo +nightly bootimage
+	cargo +nightly build
+

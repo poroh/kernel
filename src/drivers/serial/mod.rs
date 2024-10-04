@@ -58,7 +58,7 @@ where
     T: Device,
 {
     fn write_str(&mut self, s: &str) -> core::fmt::Result {
-        self.0.write_string(s);
+        let _ = self.0.write_string(s);
         Ok(())
     }
 }

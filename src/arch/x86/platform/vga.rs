@@ -12,7 +12,7 @@ pub fn write_hex(offset: isize, v: u8) {
 }
 
 #[allow(dead_code)]
-fn write_byte(offset: isize, c: u8) {
+pub fn write_byte(offset: isize, c: u8) {
     let vga_buffer = 0xb8000 as *mut u8;
     unsafe {
         *vga_buffer.offset(offset * 2) = c;
