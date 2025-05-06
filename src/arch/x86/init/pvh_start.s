@@ -4,8 +4,15 @@
         .code32
 
 _pvh_start:
+        cmp eax, 0x2badb002
+        je multiboot
+
         call com0_init
 
+        mov al, 'm'
+        call com0_printc
+
+check_protected_mode:
         mov eax, cr0
         test al, 1
         jnz protected_mode
@@ -13,6 +20,12 @@ _pvh_start:
         mov al, 'p'
         call com0_printc
         jmp die
+
+multiboot:
+        call com0_init
+        mov al, 'M'
+        call com0_printc
+        jmp check_protected_mode
 
 protected_mode: 
         mov al, 'P'
